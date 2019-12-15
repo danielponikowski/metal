@@ -1,0 +1,39 @@
+Metale notatki dane:
+C, Si, S, P, Mg, Mn, Ni - te pierwiastki musza być, czyli jezeli mam brak danych to nie ma tam 0 na 100%
+
+udzial ferytu/udzial perytu - udzial kazdej z tych faz do otoczki (osnowy) - powinny sie uzupelniac do 100%
+
+im wiekszy udzial ferytu tym wieksza wytrzymalosc (as cast)
+im wiekszy udzial perytu tym wieksza wydluzenie (as cast)
+
+
+R_2 (at cast), A_2 (at cast) - mozna uzyskac modelujac sklad chemiczny (sklad chemiczny ---> R_2, A_2)
+---> - model ML 
+
+im wieksza zawartosc krzemu tym wieksza Temperatura austenityzacji [˚C] - min 850 stopni
+Czas austenityzacji [min.] - min kilkanascie minut
+Czas przemiany izotermicznej [min.] - minimum 15 min
+Temperatura przemiany izotermicznej [˚C] - im wyzsza tym wyzsza twardosc 
+
+
+Rm [MPa] - maksymalna wartosc rozciagania
+R0,2 [MPa] - jak dochodzi do falki
+Raczej nie wprowadzac tych obu rzeczy do modelu
+
+
+Do predykcji:
+
+do wybrania jedno z:
+- Rm [MPa]	R0,2 [MPa]	A5 [%]	Twardość Brinella [HB]	Twardość Rockwella [HRC]	Twardość Rockwella [HRA]	Twardość Rockwella [HRB]	Twardość Vickersa [HV]
+
+
+i jedno z:
+
+- Udarność Charpy [J], Udział austenitu %
+
+
+metryka:
+patrzymy czy nasza predykcja wpada w przedzial +/- 5% od danej wartosci - twardosc
++/-20% dla udarnosci
+
+
