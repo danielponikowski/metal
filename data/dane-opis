@@ -37,3 +37,69 @@ patrzymy czy nasza predykcja wpada w przedzial +/- 5% od danej wartosci - twardo
 +/-20% dla udarnosci
 
 
+
+
+
+
+
+
+
+
+
+
+
+krzem - pomiedzy 2 i 3, czasem moze byc troche wiecej niz 3
+wegiel -
+siarka i fosfor - chcemy zeby bylo jak najnizsze (nie chcemy zeby bylo widecej niz 0.05)
+magnez - 0.02 - 0.07
+Mn  - ostatni ktory jest zawsze w wytopie
+
+<- gdy jakies braki  dotad to bledu, bo cos tam powinno byc
+
+
+
+od kolumny nikiel  zaczynaja sie pierwiastki ktore czesto wystepuja w ilosciach sladowych
+(poziom zazwyczaj okolo 0.01%)
+Chrom -maly, pojawia sie 18%, lepiej wyrzucic jesli pojedyncze obserwacje takie
+
+
+Kolumny 26-29 - cechy sferoidow
+100% - kula <- im blizej 100 tym lepiej, tym wytrzymalosc i wydluzenie wieksze
+zawartosc miedzy i niklu ma zwiekszych wytrzymalosc
+
+30-31 - powinny sie uzupelniac do 100%
+ (jak nie jest podane, to mozna uzupelnic; gdy nie sumuja sie do 100% to ktos nie liczyl tylko w stosunku do osnowy, ale wyrzycal te plamki)
+
+ 32-33 - wytrzymalosc i wydluzenie
+
+
+32-33 zalezy od 30-31
+
+------------------------------------------------
+teraz po obrobce cieplnej
+* kolumn 30-33 nie ma po obrobce cieplnej, ale z nimi lepsze wyniki modelu
+* na podstawie skladu chemicznego mozna zrobic predykcje wytrzymalosci i wydluzenia i tak uzupelnic te braki danych
+
+----------------------------------------------
+34-37(AK) - jaka obrobka
+temp austentyzacji powinna byc powyzej 850, im wiecej krzemu tym ta temp powinna byc wyzsza
+czas austentyzacji- co najmniej 15 min, gdy mniej to albo ktos sie pomylil albo male probki ((brak jakosci))
+
+hartowanie: 250-400 stopni, im nizsza tym wyzsza wytrzynalosc i twardosc,
+czas: 0 - niemozliwe, co najmniej 15 min powinno byc zeby w ogole cos sie zadzialo
+
+-----------------------
+Rm - wytrzynmalosc na wyciaganie
+R0,2 - silnie skorelowane z Rm
+ - lepiej nie wprowadzac tych dwoch zmiennych do modelu
+
+kolejne to to co chcemy modelowac
+
+twardosci mozna przeliczyc na jeden rodzaj twardosci <- chyba, bo tu  nie za bardzo sluchalam\
+
+
+
+udarnosc - praca potrzebna na zlamanie czegos
+
+gdy nietypowa temperatura na badanie udarnosci to ta  kolumna z temperatura
+<- gdy modelujemy udarnosc, to temp powinna byc zmienna do modelu
