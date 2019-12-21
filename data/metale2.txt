@@ -1,0 +1,37 @@
+Większość czasu przygotowywanie danych
+
+Niepewność w mierzeniu.
+Niepewność spowodowana losowością procesu.
+
+zagotowanie formy i ucieczka – nie wiadomo, które gorsze
+
+Warto patrzeć na skale: nie brać algorytmu, która 
+
+Przygotowywanie danych:
+• godzina wpisania? (kto wpisywał? jak? kiedy?
+
+
+Czyszczennie
+• bezwzględnie uzupełnić nieobecne dane
+Uzupełnianie
+• jeśli statystycznie losowa → to można uzupełnić średnią, albo regresją (w naszych danych są korelacje), 
+    można bardziej zaawansowane metody
+    przez podobieństwo (lepiej przez regresję, bo podobieństwo nie wyjdzie poza min-max)
+• jeśli jakieś np. śniadanie, czy coś takiego, to nie
+• do 5%
+Scalenie
+• wykluczanie
+• usuwanie kolumn "kontrolnych" (25×4 = 100)
+• 
+Przekszatłcanie
+• nieliniowe przekszatłcanie na danych przemysłowych atrakcyjne
+• 
+Redukcja
+
+
+SSN nie dociągają na końcach (transformacja? niesigmoidalna f krytycnza?    )
+
+W materiale jest własność pamięci. (Ferryt / perlit) 
+
+
+najbezpieczniejsza skala: HB (brinnela)
