@@ -2,14 +2,14 @@ library(dplyr)
 
 
 getwd()
-dane<-read.csv('/home/marcin/Github/metal/data/dane-zeliwo.csv', 
+dane<-read.csv('./Github/metal/data/dane-zeliwo.csv', 
                check.names=FALSE, row.names = 1)
-dane<-read.csv('/home/marcin/Github/metal/data/dane-zeliwo-uzupelnienie.csv', 
+dane<-read.csv('./Github/metal/data/dane-zeliwo-uzupelnienie.csv', 
                check.names=FALSE, row.names = 1)
-tabela_twardosci<-read.csv('/home/marcin/Github/metal/data/Tabela twardosci.csv')
-tabela_twardosci_HRA<-read.csv('/home/marcin/Github/metal/data/Tabela twardosci HRA.csv')
+tabela_twardosci<-read.csv('./Github/metal/data/Tabela twardosci.csv')
+tabela_twardosci_HRA<-read.csv('./Github/metal/data/Tabela twardosci HRA.csv')
 # tabela_twardosci_HRA$HRA<-as.numeric(as.character(tabela_twardosci_HRA$HRA))
-tabela_twardosci_HRA2<-read.csv('/home/marcin/Github/metal/data/Tabela twardosci HRA2.csv')
+tabela_twardosci_HRA2<-read.csv('./Github/metal/data/Tabela twardosci HRA2.csv')
 
 
 
@@ -99,11 +99,17 @@ dane$`Twardość Brinella [HB]`<-round(coalesce(
 x<-dane$`Twardość Brinella [HB]`
 is.na(x)%>%sum()/length(x)
 
+
+# Potrzebowałem na potrzeby pliku wola911 twardości w skali Vickerse'a
+
+HV_f_odwrotna<-splinefun(HB, HV)
+dane$`Twardość Vickersa [HV]`<-coalesce(dane$`Twardość Vickersa [HV]`, HV_f_odwrotna(dane$`Twardość Brinella [HB]`))
+
+
 # Pozostałe braki danych wynikają z braku jakiejkolwiek twardości
 all(is.na(twardosc[is.na(x),]))
 
-save(dane, file='/home/marcin/Github/metal/data/dane-zeliwo-uzupelnienie_tw.rda')
-load('../data/dane-zeliwo-uzupelnienie_tw.rda')
+save(dane, file='./Github/metal/data/dane-zeliwo-uzupelnienie_tw.rda')
+load('./Github/metal/data/dane-zeliwo-uzupelnienie_tw.rda')
 
-
-write.csv(dane,"dane-zeliwo-uzupelnienie_tw.csv")
+# write.csv(dane,"./Github/metal/data/dane-zeliwo-uzupelnienie_tw.csv")
