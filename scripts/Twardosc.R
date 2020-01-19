@@ -103,4 +103,7 @@ is.na(x)%>%sum()/length(x)
 all(is.na(twardosc[is.na(x),]))
 
 save(dane, file='/home/marcin/Github/metal/data/dane-zeliwo-uzupelnienie_tw.rda')
-load('/home/marcin/Github/metal/data/dane-zeliwo-uzupelnienie_tw.rda')
+load('../data/dane-zeliwo-uzupelnienie_tw.rda')
+
+
+write.csv(dane,"dane-zeliwo-uzupelnienie_tw.csv")
