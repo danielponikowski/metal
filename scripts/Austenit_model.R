@@ -59,6 +59,15 @@ y_pred[o]
 
 
 
+
+
+
+
+
+
+# Poniżej jakiś śmieciowy kod. Chcialem zrobic cross walidacje, ale nic madrego mi nie 
+# wyszlo. XGBoost nie chcial działać :(
+
 m<-gbm(`Udział austenitu %`~., data = dane_, 
        n.trees = 10000, cv.folds = 10, bag.fraction = 0.3)
 
