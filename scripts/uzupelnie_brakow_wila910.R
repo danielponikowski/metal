@@ -7,7 +7,9 @@ dane_wola<-read.csv('./Github/metal/data/dane-wola-910obser.csv',
 load('./Github/metal/data/dane-zeliwo-uzupelnienie_tw.rda')
 
 dane_wola<-dane_wola[,-c(1,2)]
-dane_wola
+pairs(dane_wola)
+plot(dane_wola$nikiel, dane_wola$chrom)
+plot(dane$`Ni [%]`, dane$`Cr [%]`)
 
 dane<-read.csv('./Github/metal/data/dane-zeliwo-uzupelnienie_tw.csv')
 
