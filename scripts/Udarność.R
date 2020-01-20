@@ -1,25 +1,47 @@
-#`Udział austenitu %
-#`Udarność Charpy [J]`
-
-load('./Github/metal/data/dane-zeliwo-uzupelnienie_tw.rda')
-install.packages('LightGBM')
-
 library(gbm)
 library(dplyr)
 library(randomForest)
 
+load('./Github/metal/data/dane-zeliwo-uzupelnienie_tw.rda')
+dane$`Twardość Rockwella [HRC]`<-NULL
+dane$`Twardość Rockwella [HRA]`<-NULL
+dane$`Twardość Rockwella [HRB]`<-NULL
+dane$`Twardość Vickersa [HV]`<-NULL
+# Wywalam wszystkie twardosci poza Brinellem
+
 dane_<-dane[!is.na(dane$`Udarność Charpy [J]`),]
-dane_$`Wielkość sferoidów`==""
 dane_[dane_==""]<-NA
-dane_$`Nr źródła`
+
 
 braki_danych<-apply(dane_, 2, function(x) sum(!is.na(x))/length(x))
-dane_<-dane_[,braki_danych>0.9]
+sort(braki_danych)
+q<-0.8
 
+
+z<-names(dane_[,braki_danych<=q])
+klasy<-seq(0, 1, by = 1/4)
+for(i in seq_along(z)){
+  x<-dane_[[z[i]]]
+  if(!is.numeric(x)) next
+  new<-cut(x, unique(quantile(x, klasy, na.rm = TRUE)))
+  levels(new)<-c(levels(new), "Inne")
+  new[is.na(new)]<-"Inne"
+  dane_[[z[i]]]<-new
+}
+
+# Produkuje zmienne 0-1 mówiące czy zmienna była uzupełniona brakiem
+z<-names(braki_danych)[braki_danych<1]
+for(i in seq_along(z)){
+  zz<-paste0(z[i], "_is_na")
+  dane_[[zz]]<-is.na(dane_[[z[i]]])
+}
+
+
+braki_danych<-apply(dane_, 2, function(x) sum(!is.na(x))/length(x))
+dane_<-dane_[,braki_danych>q]
 s<-sample(nrow(dane_), round(nrow(dane_)*0.2))
 dane_train<-dane_[-s,]
 dane_test<-dane_[s,]
-
 
 
 srednie<-sapply(1:ncol(dane_), function(i) mean(na.omit(dane_train[,i])))
@@ -27,14 +49,21 @@ srednie<-sapply(1:ncol(dane_), function(i) mean(na.omit(dane_train[,i])))
 for(i in 1:ncol(dane_)){
   x<-is.na(dane_[,i])
   dane_[x,i]<-srednie[i]
-  print(i)
 }
 
-
+braki_danych<-apply(dane_, 2, function(x) sum(!is.na(x))/length(x))
+dane_<-dane_[,braki_danych>q]
 
 dane_train<-dane_[-s,]
 dane_test<-dane_[s,]
 
+
+
+
+################## GBM
+
+dane_train<-dane_[-s,]
+dane_test<-dane_[s,]
 
 m<-gbm(`Udarność Charpy [J]`~., data = dane_train, 
        n.trees = 10000)
@@ -43,10 +72,9 @@ m<-gbm(`Udarność Charpy [J]`~., data = dane_train,
 y_pred<-predict(m, dane_test, n.trees = 10000)
 y<-dane_test$`Udarność Charpy [J]`
 
-
+res<-(y-y_pred)
 mean(res^2)
 
-res<-(y-y_pred)
 res%>%density()%>%plot()
 (res/y)%>%density()%>%plot()
 
@@ -68,10 +96,10 @@ dane_test<-dane__[s,]
 dane_train<-dane__[-s,]
 
 m<-randomForest(`Udarność.Charpy..J.`~., data = dane_train, 
-       n.trees = 10000)
+       n.trees = 100000)
 
 
-y_pred<-predict(m, dane_test, n.trees = 10000)
+y_pred<-predict(m, dane_test)
 y<-dane_test$`Udarność.Charpy..J.`
 
 res<-(y-y_pred)
@@ -102,8 +130,6 @@ m<-gbm(`Udarność Charpy [J]`~., data = dane_,
 m<-gbm(`Udarność Charpy [J]`~., data = dane_,
          family = "gaussian",
          bag.fraction = 0.5)
-
-m$train.error
 
 
 
