@@ -15,14 +15,22 @@ dane_[dane_==""]<-NA
 
 braki_danych<-apply(dane_, 2, function(x) sum(!is.na(x))/length(x))
 sort(braki_danych)
-q<-0.8
+
+# Jeżeli jakość zmiennej będzie powyżej progu q, to imputuje zmienną średnią.
+# Jeżeli poniżej, to dzielę zmienna według kwantyli i wprowadzam jako factor
+# + dodatkowy poziom na braki
+q<-0.9
 
 
 z<-names(dane_[,braki_danych<=q])
-klasy<-seq(0, 1, by = 1/4)
+
 for(i in seq_along(z)){
   x<-dane_[[z[i]]]
   if(!is.numeric(x)) next
+  
+  # k<-1 + 3.322*log(length(na.omit(x))) # liczba klas według zasady kciuka dla histogramów
+  k<-3
+  klasy<-seq(0, 1, by = 1/k)
   new<-cut(x, unique(quantile(x, klasy, na.rm = TRUE)))
   levels(new)<-c(levels(new), "Inne")
   new[is.na(new)]<-"Inne"
@@ -66,11 +74,21 @@ dane_train<-dane_[-s,]
 dane_test<-dane_[s,]
 
 m<-gbm(`Udarność Charpy [J]`~., data = dane_train, 
-       n.trees = 10000)
+       n.trees = 50000)
 
 
-y_pred<-predict(m, dane_test, n.trees = 10000)
 y<-dane_test$`Udarność Charpy [J]`
+
+l<-seq(0, 5000, by = 100)
+mse<-vector()
+for(i in seq_along(l)){
+  mse[i]<-mean((y-predict(m, dane_test, n.trees = l[i]))^2)
+}
+plot(l, mse, type='l')
+
+
+y<-dane_test$`Udarność Charpy [J]`
+y_pred<-predict(m, dane_test, n.trees = 4000)
 
 res<-(y-y_pred)
 mean(res^2)
@@ -78,6 +96,7 @@ mean(res^2)
 res%>%density()%>%plot()
 (res/y)%>%density()%>%plot()
 
+mean(abs((res/y))<0.1)
 mean(abs((res/y))<0.2)
 
 o<-order(-abs(res))
@@ -86,6 +105,18 @@ y_pred[o]
 
 
 
+y<-dane_train$`Udarność Charpy [J]`
+y_pred<-predict(m, dane_train, n.trees = 4000)
+
+res<-(y-y_pred)
+mean(res^2)
+
+res%>%density()%>%plot()
+(res/y)%>%density()%>%plot()
+o<-order(-abs(res/y))
+res[o]/y[o]
+y[o]
+y_pred[o]
 
 ########## Lasy
 
