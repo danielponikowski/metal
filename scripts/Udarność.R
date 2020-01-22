@@ -156,7 +156,7 @@ res_train%>%density()%>%plot()
 
 ################### Usunięcie obserwacji odstających
 
-dane_train_2<-dane_train[(res_train/y_train)<5,]
+dane_train_2<-dane_train[(res_train/y_train)<1,]
 
 m2<-gbm(`Udarność Charpy [J]`~., data = dane_train_2, 
        n.trees =8000)
@@ -199,6 +199,15 @@ mean(res^2)
 mean(res2^2)
 
 # Wychodzi gorzej :(
+
+
+
+plot(sort(y), ylab="Udarność")
+lines(sort(y)*1.2, lty=2, col = 'red')
+lines(sort(y)*0.8, lty=2, col = 'red')
+points(y_pred2[order(y)], col = 'red')
+
+
 
 
 ########## Poniżej nieodświeżony, prawdopodobnie niedziałający kod. Nie uruchamiać.
