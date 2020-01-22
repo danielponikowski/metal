@@ -3,6 +3,7 @@ library(dplyr)
 library(randomForest)
 
 load('./Github/metal/data/dane-zeliwo-uzupelnienie_tw.rda')
+read.csv('./Github/metal/data/dane-zeliwo-uzupelnienie_tw.csv')
 dane$`Twardość Rockwella [HRC]`<-NULL
 dane$`Twardość Rockwella [HRA]`<-NULL
 dane$`Twardość Rockwella [HRB]`<-NULL
@@ -12,8 +13,12 @@ dane$`Twardość Vickersa [HV]`<-NULL
 dane_<-dane[!is.na(dane$`Udarność Charpy [J]`),]
 dane_[dane_==""]<-NA
 
+s<-sample(nrow(dane_), round(nrow(dane_)*0.2))
+dane_train<-dane_[-s,]
+dane_test<-dane_[s,]
+dane_test_final<-dane_[s,]
 
-braki_danych<-apply(dane_, 2, function(x) sum(!is.na(x))/length(x))
+braki_danych<-apply(dane_train, 2, function(x) sum(!is.na(x))/length(x))
 sort(braki_danych)
 
 # Jeżeli jakość zmiennej będzie powyżej progu q, to imputuje zmienną średnią.
@@ -22,73 +27,91 @@ sort(braki_danych)
 q<-0.9
 
 
-z<-names(dane_[,braki_danych<=q])
+z<-names(dane_train[,braki_danych<=q])
 
 for(i in seq_along(z)){
-  x<-dane_[[z[i]]]
+  x<-dane_train[[z[i]]]
+  x_test<-dane_test[[z[i]]]
+  x_test_final<-dane_test_final[[z[i]]]
+  
   if(!is.numeric(x)) next
   
-  # k<-1 + 3.322*log(length(na.omit(x))) # liczba klas według zasady kciuka dla histogramów
+  # k<-floor(1 + 3.322*log(length(na.omit(x)))) # liczba klas według zasady kciuka dla histogramów
   k<-3
   klasy<-seq(0, 1, by = 1/k)
-  new<-cut(x, unique(quantile(x, klasy, na.rm = TRUE)))
+  podzial<-unique(quantile(x, klasy, na.rm = TRUE))
+  podzial[1]<- -Inf
+  podzial[length(podzial)]<- Inf
+  
+  new<-cut(x, podzial)
+  new_test<-cut(x_test, podzial)
+  new_test_final<-cut(x_test_final, podzial)
+  
   levels(new)<-c(levels(new), "Inne")
+  levels(new_test)<-levels(new)
+  levels(new_test_final)<-levels(new)
+  
   new[is.na(new)]<-"Inne"
-  dane_[[z[i]]]<-new
+  new_test[is.na(new_test)]<-"Inne"
+  new_test_final[is.na(new_test_final)]<-"Inne"
+  
+  dane_train[[z[i]]]<-new
+  dane_test[[z[i]]]<-new_test
+  dane_test_final[[z[i]]]<-new_test_final
 }
 
 # Produkuje zmienne 0-1 mówiące czy zmienna była uzupełniona brakiem
 z<-names(braki_danych)[braki_danych<1]
 for(i in seq_along(z)){
   zz<-paste0(z[i], "_is_na")
-  dane_[[zz]]<-is.na(dane_[[z[i]]])
+  dane_train[[zz]]<-as.integer(is.na(dane_train[[z[i]]]))
+  dane_test[[zz]]<-as.integer(is.na(dane_test[[z[i]]]))
+  dane_test_final[[zz]]<-as.integer(is.na(dane_test_final[[z[i]]]))
 }
 
 
-braki_danych<-apply(dane_, 2, function(x) sum(!is.na(x))/length(x))
-dane_<-dane_[,braki_danych>q]
-s<-sample(nrow(dane_), round(nrow(dane_)*0.2))
-dane_train<-dane_[-s,]
-dane_test<-dane_[s,]
-
+braki_danych<-apply(dane_train, 2, function(x) sum(!is.na(x))/length(x))
+dane_train<-dane_train[,braki_danych>q]
+dane_test<-dane_test[,braki_danych>q]
+dane_test_final<-dane_test_final[,braki_danych>q]
 
 srednie<-sapply(1:ncol(dane_), function(i) mean(na.omit(dane_train[,i])))
 
 for(i in 1:ncol(dane_)){
-  x<-is.na(dane_[,i])
-  dane_[x,i]<-srednie[i]
+  dane_train[is.na(dane_train[,i]),i]<-srednie[i]
+  dane_test[is.na(dane_test[,i]),i]<-srednie[i]
+  dane_test_final[is.na(dane_test_final[,i]),i]<-srednie[i]
 }
 
-braki_danych<-apply(dane_, 2, function(x) sum(!is.na(x))/length(x))
-dane_<-dane_[,braki_danych>q]
+braki_danych<-apply(dane_train, 2, function(x) sum(!is.na(x))/length(x))
+dane_train<-dane_train[,braki_danych>q]
+dane_test<-dane_test[,braki_danych>q]
+dane_test_final<-dane_test_final[,braki_danych>q]
 
-dane_train<-dane_[-s,]
-dane_test<-dane_[s,]
 
 
 
 
 ################## GBM
 
-dane_train<-dane_[-s,]
-dane_test<-dane_[s,]
 
 m<-gbm(`Udarność Charpy [J]`~., data = dane_train, 
-       n.trees = 50000)
+       n.trees =8000)
 
 
 y<-dane_test$`Udarność Charpy [J]`
 
-l<-seq(0, 5000, by = 100)
+l<-seq(0, 8000, by = 100)
 mse<-vector()
 for(i in seq_along(l)){
   mse[i]<-mean((y-predict(m, dane_test, n.trees = l[i]))^2)
 }
 plot(l, mse, type='l')
+(n_trees<-l[which.min(mse)])
 
 
 y<-dane_test$`Udarność Charpy [J]`
-y_pred<-predict(m, dane_test, n.trees = 4000)
+y_pred<-predict(m, dane_test, n.trees = n_trees)
 
 res<-(y-y_pred)
 mean(res^2)
@@ -102,6 +125,8 @@ mean(abs((res/y))<0.2)
 o<-order(-abs(res))
 y[o]
 y_pred[o]
+res[o]
+
 
 
 
@@ -117,6 +142,13 @@ o<-order(-abs(res/y))
 res[o]/y[o]
 y[o]
 y_pred[o]
+
+
+
+
+
+
+########## Poniżej nieodświeżony, prawdopodobnie niedziałający kod. Nie uruchamiać.
 
 ########## Lasy
 
