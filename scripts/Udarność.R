@@ -174,7 +174,7 @@ plot(l, mse, type='l')
 
 
 y<-dane_test$`Udarność Charpy [J]`
-y_pred2<-predict(m2, dane_test, n.trees = n_trees)
+y_pred2<-pmax(y_min, predict(m2, dane_test, n.trees = n_trees))
 
 res2<-(y-y_pred2)
 mean(res2^2)
