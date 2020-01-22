@@ -13,6 +13,8 @@ dane$`Twardość Vickersa [HV]`<-NULL
 dane_<-dane[!is.na(dane$`Udarność Charpy [J]`),]
 dane_[dane_==""]<-NA
 
+
+set.seed(123)
 s<-sample(nrow(dane_), round(nrow(dane_)*0.2))
 dane_train<-dane_[-s,]
 dane_test<-dane_[s,]
@@ -24,7 +26,7 @@ sort(braki_danych)
 # Jeżeli jakość zmiennej będzie powyżej progu q, to imputuje zmienną średnią.
 # Jeżeli poniżej, to dzielę zmienna według kwantyli i wprowadzam jako factor
 # + dodatkowy poziom na braki
-q<-0.9
+q<-0.95
 
 
 z<-names(dane_train[,braki_danych<=q])
@@ -36,8 +38,8 @@ for(i in seq_along(z)){
   
   if(!is.numeric(x)) next
   
-  # k<-floor(1 + 3.322*log(length(na.omit(x)))) # liczba klas według zasady kciuka dla histogramów
-  k<-3
+  k<-floor(1 + 3.322*log(length(na.omit(x)))) # liczba klas według zasady kciuka dla histogramów
+  # k<-3
   klasy<-seq(0, 1, by = 1/k)
   podzial<-unique(quantile(x, klasy, na.rm = TRUE))
   podzial[1]<- -Inf
@@ -128,7 +130,13 @@ y_pred[o]
 res[o]
 
 
+plot(sort(y), ylab="Udarność")
+points(y_pred[order(y)], col = 'red')
 
+
+
+
+# Bład na zbiorze treningowym - może wywalić jakiś obserwacje?
 
 y<-dane_train$`Udarność Charpy [J]`
 y_pred<-predict(m, dane_train, n.trees = 4000)
@@ -178,6 +186,9 @@ o<-order(-abs(res))
 y[o]
 y_pred[o]
 
+
+plot(sort(y), ylab = 'Udarność')
+points(y_pred[order(y)], col = 'red')
 
 
 
