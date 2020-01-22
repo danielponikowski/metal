@@ -100,6 +100,7 @@ dane_test_final<-dane_test_final[,braki_danych>q]
 m<-gbm(`Udarność Charpy [J]`~., data = dane_train, 
        n.trees =8000)
 y_min<-min(dane_train$`Udarność Charpy [J]`)
+y_max<-max(dane_train$`Udarność Charpy [J]`)
 
 
 y<-dane_test$`Udarność Charpy [J]`
@@ -107,14 +108,15 @@ y<-dane_test$`Udarność Charpy [J]`
 l<-seq(0, 8000, by = 100)
 mse<-vector()
 for(i in seq_along(l)){
-  mse[i]<-mean((y-predict(m, dane_test, n.trees = l[i]))^2)
+  y_pred<-pmin(y_max, pmax(y_min, predict(m, dane_test, n.trees = l[i])))
+  mse[i]<-mean((y-y_pred)^2)
 }
 plot(l, mse, type='l')
 (n_trees<-l[which.min(mse)])
 
 # Wychodziły czasami ujemne predykcje
 y<-dane_test$`Udarność Charpy [J]`
-y_pred<-pmax(y_min, predict(m, dane_test, n.trees = n_trees))
+y_pred<-pmin(y_max, pmax(y_min, predict(m, dane_test, n.trees = n_trees)))
 
 res<-(y-y_pred)
 mean(res^2)
@@ -156,7 +158,7 @@ res_train%>%density()%>%plot()
 
 ################### Usunięcie obserwacji odstających
 
-dane_train_2<-dane_train[(res_train/y_train)<1,]
+dane_train_2<-dane_train[(res_train/y_train)<3.5,]
 
 m2<-gbm(`Udarność Charpy [J]`~., data = dane_train_2, 
        n.trees =8000)
@@ -166,15 +168,17 @@ y<-dane_test$`Udarność Charpy [J]`
 
 l<-seq(0, 8000, by = 100)
 mse<-vector()
+
 for(i in seq_along(l)){
-  mse[i]<-mean((y-predict(m, dane_test, n.trees = l[i]))^2)
+  y_pred2<-pmin(y_max, pmax(y_min, predict(m2, dane_test, n.trees = l[i])))
+  mse[i]<-mean((y-y_pred2)^2)
 }
 plot(l, mse, type='l')
 (n_trees<-l[which.min(mse)])
 
 
 y<-dane_test$`Udarność Charpy [J]`
-y_pred2<-pmax(y_min, predict(m2, dane_test, n.trees = n_trees))
+y_pred2<-pmin(y_max, pmax(y_min, predict(m2, dane_test, n.trees = n_trees)))
 
 res2<-(y-y_pred2)
 mean(res2^2)
@@ -198,8 +202,9 @@ points(y_pred2[order(y)], col = 'red')
 mean(res^2)
 mean(res2^2)
 
-# Wychodzi gorzej :(
 
+# Wychodzi gorzej :(
+# Raczej zostańmy bez wyrzucania obserwacji, które słabo się zamodelowały
 
 
 plot(sort(y), ylab="Udarność")
@@ -207,8 +212,8 @@ lines(sort(y)*1.2, lty=2, col = 'red')
 lines(sort(y)*0.8, lty=2, col = 'red')
 points(y_pred2[order(y)], col = 'red')
 
-
-
+max(y_pred2)
+max(y)
 
 ########## Poniżej nieodświeżony, prawdopodobnie niedziałający kod. Nie uruchamiać.
 # 
