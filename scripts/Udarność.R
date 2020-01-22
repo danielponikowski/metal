@@ -131,6 +131,8 @@ res[o]
 
 
 plot(sort(y), ylab="Udarność")
+lines(sort(y)*1.2, lty=2, col = 'red')
+lines(sort(y)*0.8, lty=2, col = 'red')
 points(y_pred[order(y)], col = 'red')
 
 
