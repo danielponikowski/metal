@@ -1,7 +1,7 @@
-
-load('./Github/metal/data/dane-zeliwo-uzupelnienie_tw.rda')
-install.packages('LightGBM')
-
+getwd()
+load('../data/dane-zeliwo-uzupelnienie_tw.rda')
+# install.packages('LightGBM')
+# 
 library(gbm)
 library(dplyr)
 library(randomForest)
@@ -44,11 +44,11 @@ y_pred<-predict(m, dane_test, n.trees = 10000)
 y<-dane_test$`Udział austenitu %`
 
 
-mean(res^2)
 
 res<-(y-y_pred)
 res%>%density()%>%plot()
 (res/y)%>%density()%>%plot()
+mean(res^2)
 
 mean(abs((res/y))<0.1)
 
@@ -103,6 +103,25 @@ model <- train(
 # Best tuning parameter
 model$bestTune
 
+?train
 
+dane_test
+library("xgboost")
+??xgb.Dmatrix
+y_pred<-predict(model, dane_test)
+y<-dane_test$`Udział austenitu %`
+
+
+
+res<-(y-y_pred)
+res%>%density()%>%plot()
+(res/y)%>%density()%>%plot()
+mean(res^2)
+
+mean(abs((res/y))<0.1)
+
+o<-order(-abs(res))
+y[o]
+y_pred[o]
 
 
